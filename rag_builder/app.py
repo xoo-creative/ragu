@@ -233,24 +233,7 @@ def reset_assistant(state: State):
     state.refresh("rag_ready")
     state.refresh("conversation")
 
-    notify(state, "success", "Agent now forgotten about the knowledge you uploaded!")
-
-
-# def select_conv(state: State, var_name: str, value) -> None:
-#     """
-#     Selects conversation from past_conversations
-
-#     Args:
-#         state: The current state of the app.
-#         var_name: "selected_conv"
-#         value: [[id, conversation]]
-#     """
-#     state.conversation = state.past_conversations[value[0][0]][1]
-#     state.context = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How can I help you today? "
-#     for i in range(2, len(state.conversation["Conversation"]), 2):
-#         state.context += f"Human: \n {state.conversation['Conversation'][i]}\n\n AI:"
-#         state.context += state.conversation["Conversation"][i + 1]
-#     state.selected_row = [len(state.conversation["Conversation"]) + 1]
+    notify(state, "success", "Rug is reset!")
 
 
 past_prompts = []
@@ -265,7 +248,7 @@ homepage = """
 
 #### What do you want it to know?
 
-For example, you can input your **lecture notes**, **wikipedia articles**, **tech documentation** ... and many more!
+For example, you can input your **lecture notes**, **wikipedia articles**, **documentation for a technology** ... and many more applications!
 
 <br/>
 
