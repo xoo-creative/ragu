@@ -32,6 +32,5 @@ def read_pdf(pdf_path:str):
     doc = fitz.open(pdf_path)
     for page in doc: 
         text += page.get_text().replace("\n", "")
-
     
     return text
