@@ -1,12 +1,13 @@
 import os
 import sys
 
-from taipy.gui import Gui, State, notify
+from taipy.gui import Gui, State, notify, navigate
 import openai
 from dotenv import load_dotenv
 import logging
 
 from rag_builder.assistant import Assistant
+from rag_builder.commons.page import Page
 from rag_builder.commons.utils import read_pdf
 
 # Configure logger
@@ -144,6 +145,15 @@ def reset_chat(state: State) -> None:
     state.conversation = {
         "Conversation": ["Who are you?", "Hi! I am GPT-3. How can I help you today?"]
     }
+    gui: Gui = state.get_gui()
+    page_index = len(state.list_of_pages)
+    page_name = f"New_Conversation_{page_index}"
+    page_path = f"conversation_{page_index}"
+    gui.add_page(page_path, homepage)
+    state.list_of_pages.append(Page(page_path, page_name))
+
+    state.refresh("list_of_pages")
+
 
 
 def tree_adapter(item: list) -> [str, str]:
@@ -178,8 +188,11 @@ def load_knowledge(state: State):
 def load_file(state: State):
     a: Assistant = state.assistant
     logging.info(f"Uploaded files looks like {state.uploaded_files}")
-    text = read_pdf(state.uploaded_files)
-    state.uploaded_files_text.append(text)
+
+    for file in state.uploaded_files:
+        text = read_pdf(file)
+        state.uploaded_files_text.append(text)
+
     state.refresh("uploaded_files_text")
     print(text)
 
@@ -203,19 +216,20 @@ def select_conv(state: State, var_name: str, value) -> None:
 
 past_prompts = []
 
-page = """
-<|layout|columns=300px 1|
+homepage = """
+<|layout|columns= 1 4|
 <|part|render=True|class_name=sidebar|
 # **Build Your Own RAGs**{: .color-primary} # {: .logo-text}
 
 #### What do you want it to know?
 
 **URLS**
+
 <|{knowledge_urls}|input|label=URLs (separated by ';')|multiline|lines_shown=2|>
 
 **Files**
 
-<|{uploaded_files}|file_selector|label=Select File|on_action=load_file|extensions=.csv,.pdf|>
+<|{uploaded_files}|file_selector|label=Select File|on_action=load_file|extensions=.csv,.pdf|multiple|>
 
 <br/>
 <br/>
@@ -237,6 +251,36 @@ page = """
 |>
 |>
 """
+def make_menu_item(page: Page) -> str:
+    return page.convert_to_taipy_menu_page()
+
+def on_menu(state, action, info):
+    page = info["args"][0]
+    navigate(state, to=page)
+
+list_of_pages = [Page("home", "Home")]
+"""
+<br/>
+
+<br/>
+
+**Code by [@tommysteryy](https://github.com/tommysteryy)**
+
+Original code can be found [here](https://github.com/xoo-creative/rag-builder).
+"""
+
+root_md = """
+
+<|menu|label=Menu|lov={list_of_pages}|on_action=on_menu|adapter=make_menu_item|>
+
+<|content|>
+
+"""
+
+pages = {
+    "/": root_md,
+    "home": homepage
+}
 
 if __name__ == "__main__":
     load_dotenv()
@@ -254,4 +298,4 @@ if __name__ == "__main__":
 
     assistant = Assistant()
 
-    Gui(page).run(debug=True, dark_mode=True, use_reloader=True)
+    Gui(pages=pages).run(debug=True, dark_mode=True, use_reloader=True)

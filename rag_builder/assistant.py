@@ -103,7 +103,7 @@ class Assistant:
 
             
     def _chunk(self):
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
         self.chunks = text_splitter.split_documents(self.documents)
         return self.chunks
 

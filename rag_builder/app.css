@@ -1,6 +1,6 @@
-body {
-  overflow: hidden;
-}
+/* body {
+  overflow: scroll;
+} */
 
 .gpt_message td  {
     margin-left: 30px;
@@ -31,7 +31,7 @@ body {
     font-size: large;
   }
 
-  :root {
+  /* :root {
     --element-padding: 1.5rem;
   }
   
@@ -41,7 +41,7 @@ body {
   main {
     flex: 0 0 100%;
   }
-  
+   */
   /**** PASSED PROMPT LIST ****/
   
   .past_prompts_list .MuiPaper-root {
