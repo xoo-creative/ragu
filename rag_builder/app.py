@@ -202,6 +202,21 @@ def load_file(state: State):
     state.refresh("uploaded_files_text")
     print(text)
 
+def reset_assistant(state: State):
+    new_a = Assistant()
+    state.assistant = new_a
+
+    state.knowledge_urls = ""
+    state.uploaded_files = []
+    state.uploaded_files_text = []
+
+    state.refresh("assistant")
+    state.refresh("knowledge_urls")
+    state.refresh("uploaded_files")
+    state.refresh("uploaded_files_text")
+
+    notify(state, "success", "Agent now forgotten about the knowledge you uploaded!")
+
 
 # def select_conv(state: State, var_name: str, value) -> None:
 #     """
@@ -218,14 +233,6 @@ def load_file(state: State):
 #         state.context += f"Human: \n {state.conversation['Conversation'][i]}\n\n AI:"
 #         state.context += state.conversation["Conversation"][i + 1]
 #     state.selected_row = [len(state.conversation["Conversation"]) + 1]
-
-"""
-<|New Conversation|button|class_name=fullwidth plain|id=reset_app_button|on_action=reset_chat|>
-### Previous activities ### {: .h5 .mt2 .mb-half}
-<|{selected_conv}|tree|lov={past_conversations}|class_name=past_prompts_list|multiple|adapter=tree_adapter|on_change=select_conv|>
-
-
-"""
 
 
 past_prompts = []
@@ -255,7 +262,7 @@ homepage = """
 <br/>
 ---
 <br/>
-<|New Conversation|button|class_name=fullwidth plain|id=reset_app_button|on_action=reset_chat|>
+<|Clear Knowledge|button|class_name=fullwidth plain|id=reset_app_button|on_action=reset_assistant|>
 |>
 
 
