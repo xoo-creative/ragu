@@ -76,7 +76,7 @@ def update_context(state: State) -> None:
         - state: The current state of the app.
     """
     # state.context += f"Human: \n {state.current_user_message}\n\n AI:"
-    answer = state.assistant.ask(state.current_user_message).replace("\n", "")
+    answer = state.assistant.ask(state.current_user_message)
     print(answer)
     # answer = request(state, state.context).replace("\n", "")
     state.context += answer
@@ -203,21 +203,21 @@ def load_file(state: State):
     print(text)
 
 
-def select_conv(state: State, var_name: str, value) -> None:
-    """
-    Selects conversation from past_conversations
+# def select_conv(state: State, var_name: str, value) -> None:
+#     """
+#     Selects conversation from past_conversations
 
-    Args:
-        state: The current state of the app.
-        var_name: "selected_conv"
-        value: [[id, conversation]]
-    """
-    state.conversation = state.past_conversations[value[0][0]][1]
-    state.context = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How can I help you today? "
-    for i in range(2, len(state.conversation["Conversation"]), 2):
-        state.context += f"Human: \n {state.conversation['Conversation'][i]}\n\n AI:"
-        state.context += state.conversation["Conversation"][i + 1]
-    state.selected_row = [len(state.conversation["Conversation"]) + 1]
+#     Args:
+#         state: The current state of the app.
+#         var_name: "selected_conv"
+#         value: [[id, conversation]]
+#     """
+#     state.conversation = state.past_conversations[value[0][0]][1]
+#     state.context = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How can I help you today? "
+#     for i in range(2, len(state.conversation["Conversation"]), 2):
+#         state.context += f"Human: \n {state.conversation['Conversation'][i]}\n\n AI:"
+#         state.context += state.conversation["Conversation"][i + 1]
+#     state.selected_row = [len(state.conversation["Conversation"]) + 1]
 
 """
 <|New Conversation|button|class_name=fullwidth plain|id=reset_app_button|on_action=reset_chat|>

@@ -65,7 +65,7 @@ class Assistant:
         self.conversation_chain = ConversationalRetrievalChain.from_llm(
             llm=self.llm,
             chain_type="stuff",
-            retriever=self.vectorstore.as_retriever(),
+            retriever=self.vectorstore.as_retriever(search_kwargs={'k': 9}),
             memory=self.memory
         )
 
