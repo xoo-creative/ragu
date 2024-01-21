@@ -14,6 +14,7 @@ from langchain.memory import ConversationBufferMemory
 from pypdf import PdfReader
 from PyPDF2 import PdfFileReader
 from lxml.html import fromstring
+from bs4 import BeautifulSoup
 
 from rag_builder.commons.utils import clear, load_prompt
 
@@ -95,13 +96,17 @@ class Assistant:
 
     def read_url(self, url) -> str:
 
-        res = requests.get(url)
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        text = soup.get_text()
 
-        tree = fromstring(res.content)
+        logging.info(f"soup get text looks like {text}")
+
+        tree = fromstring(response.content)
         title = tree.findtext('.//title')
         self.documents_loaded.append(f"{title} (URL)")
 
-        return res.text
+        return text
     
     def current_knowledge(self) -> str:
         """

@@ -8,7 +8,7 @@ import logging
 
 from rag_builder.assistant import Assistant
 from rag_builder.commons.page import Page
-from rag_builder.commons.utils import read_pdf
+from rag_builder.commons.utils import get_file_name, read_pdf
 
 # Configure logger
 logging.basicConfig(format="\n%(asctime)s\n%(message)s", level=logging.DEBUG, force=True)
@@ -193,7 +193,7 @@ def load_knowledge(state: State):
 
     state.refresh("conversation")
 
-    notify(state, "success", "Agent now knows about the presidential statement!")
+    notify(state, "success", "Successfully loaded knowledge into Rug.")
 
 def load_file(state: State):
     a: Assistant = state.assistant
@@ -203,16 +203,12 @@ def load_file(state: State):
         for file in state.uploaded_files:
             text = read_pdf(file)
             state.uploaded_files_text.append(text)
-
-            filename = os.path.basename(file)
-            state.assistant.add_knowledge_source(filename)
+            state.assistant.add_knowledge_source(get_file_name(file))
 
     elif type(state.uploaded_files) == str:
         text = read_pdf(state.uploaded_files)
         state.uploaded_files_text.append(text)
-
-        filename = os.path.basename(state.uploaded_files)
-        state.assistant.add_knowledge_source(filename)
+        state.assistant.add_knowledge_source(get_file_name(state.uploaded_files))
 
     else:
         raise RuntimeError("File is not being read, please check the logs.")
