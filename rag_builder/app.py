@@ -156,6 +156,14 @@ def tree_adapter(item: list) -> [str, str]:
         return (identifier, item[1]["Conversation"][2][:50] + "...")
     return (item[0], "Empty conversation")
 
+def load_knowledge(state: State):
+    a: Assistant = state.assistant
+
+    a.initialize_knowledge()
+
+    notify(state, "success", "Agent now knows about the presidential statement!")
+    
+
 
 def select_conv(state: State, var_name: str, value) -> None:
     """
@@ -180,6 +188,7 @@ page = """
 <|layout|columns=300px 1|
 <|part|render=True|class_name=sidebar|
 # Taipy **Chat**{: .color-primary} # {: .logo-text}
+<|Load Knowledge|button|class_name=fullwidth plain|id=reset_app_button|on_action=load_knowledge|>
 <|New Conversation|button|class_name=fullwidth plain|id=reset_app_button|on_action=reset_chat|>
 ### Previous activities ### {: .h5 .mt2 .mb-half}
 <|{selected_conv}|tree|lov={past_conversations}|class_name=past_prompts_list|multiple|adapter=tree_adapter|on_change=select_conv|>

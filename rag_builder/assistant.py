@@ -37,10 +37,11 @@ class Assistant:
         self.prompt = self.initialize_prompt()
         self.llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
         self.memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
-        self.initialize_knowledge()
+        self.initialized = False
         pass
 
     def initialize_knowledge(self):
+
         self._load_url()
         self._chunk()
         self.embed_and_store()
@@ -52,6 +53,7 @@ class Assistant:
             memory=self.memory
         )
 
+        self.initialized = True
     def extract_information(self, pdf_path:str):
         doc = fitz.open(pdf_path)
         for page in doc: 
@@ -102,7 +104,7 @@ class Assistant:
         Asks the assistant a question, returns an answer related to the text.
         """
 
-        if self.vectorstore == None:
+        if not self.initialized:
             raise RuntimeError("You have not run 'Assistant.initialize()' yet, so the vector store is empty.")
         logging.debug("Begun query")
         result = self.conversation_chain.invoke({"question": query})
