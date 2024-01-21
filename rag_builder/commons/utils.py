@@ -1,5 +1,5 @@
 import pkg_resources
-
+import fitz
 import logging
 
 
@@ -26,3 +26,12 @@ def load_prompt(prompt_file_name: str) -> str:
 
 def clear(filepath: str) -> None:
     open(filepath, 'w').close()
+
+def read_pdf(pdf_path:str):
+    text = ""
+    doc = fitz.open(pdf_path)
+    for page in doc: 
+        text += page.get_text().replace("\n", "")
+
+    
+    return text

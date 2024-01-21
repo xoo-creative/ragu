@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import logging
 
 from rag_builder.assistant import Assistant
+from rag_builder.commons.utils import read_pdf
 
 # Configure logger
 logging.basicConfig(format="\n%(asctime)s\n%(message)s", level=logging.DEBUG, force=True)
@@ -22,6 +23,8 @@ selected_conv = None
 selected_row = [1]
 
 knowledge_urls = ""
+uploaded_files = []
+uploaded_files_text = []
 
 
 def on_init(state: State) -> None:
@@ -162,11 +165,23 @@ def load_knowledge(state: State):
 
     a: Assistant = state.assistant
     urls: str = state.knowledge_urls
+    files = state.uploaded_files_text
 
-    a.initialize_knowledge(urls = urls.split(";"))
+    logging.info(f"Files looks like this: {files}")
+
+
+    urls = [] if urls == "" else urls.split(";")
+    a.initialize_knowledge(urls = urls, file_contents=files)
 
     notify(state, "success", "Agent now knows about the presidential statement!")
-    
+
+def load_file(state: State):
+    a: Assistant = state.assistant
+    logging.info(f"Uploaded files looks like {state.uploaded_files}")
+    text = read_pdf(state.uploaded_files)
+    state.uploaded_files_text.append(text)
+    state.refresh("uploaded_files_text")
+    print(text)
 
 
 def select_conv(state: State, var_name: str, value) -> None:
@@ -195,8 +210,14 @@ page = """
 
 #### What do you want it to know?
 
+**URLS**
 <|{knowledge_urls}|input|label=URLs (separated by ';')|multiline|lines_shown=2|>
 
+**Files**
+
+<|{uploaded_files}|file_selector|label=Select File|on_action=load_file|extensions=.csv,.pdf|>
+
+<br/>
 <br/>
 
 <|Load Knowledge|button|class_name=fullwidth plain|id=reset_app_button|on_action=load_knowledge|>

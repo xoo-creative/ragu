@@ -42,9 +42,30 @@ class Assistant:
         self.initialized = False
         pass
 
-    def initialize_knowledge(self, urls = list[str]):
+    def read_pdfs(self, files) -> list[Document]:
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=500,
+            chunk_overlap=50,
+        )
+        return text_splitter.create_documents([self.read_pdf(files)])
+    
+    def parse_file_contents(self, file_contents: list[str]) -> list[Document]:
+        if len(file_contents) == 0:
+            return []
+        
+        logging.info("Creating documents from uploaded files. ")
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=500,
+            chunk_overlap=50,
+        )
+        return text_splitter.create_documents(file_contents)
+
+    def initialize_knowledge(self, urls: list[str], file_contents: list[str]):
 
         self.documents = self.read_urls(urls)
+
+        self.documents += self.parse_file_contents(file_contents)
+
         self._chunk()
         self.embed_and_store()
 
@@ -56,27 +77,17 @@ class Assistant:
         )
 
         self.initialized = True
-    def extract_information(self, pdf_path:str):
-        doc = fitz.open(pdf_path)
-        for page in doc: 
-            text = page.get_text() 
-            print(text)
 
-            
-
-            # txt = ""
-            # reader = PdfReader(pdf_path)
-            # print(len(reader.pages))
-            # page = reader.pages[0]
-            # txt = page.extract_text()
-
-            # print(txt)
-            # return txt
-        
     def read_urls(self, list_of_urls = list[str]) -> list[Document]:
+
+        if len(list_of_urls) == 0:
+            return []
+        
         url_texts = []
         for url in list_of_urls:
             url_texts.append(self.read_url(url))
+
+        logging.info("Creating documents from content from urls.")
 
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=500,
@@ -92,7 +103,7 @@ class Assistant:
 
             
     def _chunk(self):
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
         self.chunks = text_splitter.split_documents(self.documents)
         return self.chunks
 

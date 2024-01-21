@@ -10,5 +10,6 @@ Build your own RAG Chatbots with only your documents!
 - https://towardsdatascience.com/retrieval-augmented-generation-rag-from-theory-to-langchain-implementation-4e9bd5f6a4f2
 
 ## Raw text files
+- https://raw.githubusercontent.com/langchain-ai/langchain/master/docs/docs/modules/state_of_the_union.txt
 - https://raw.githubusercontent.com/xoo-creative/virtucrime/main/transcripts/daniellekirsty/2kNKyVafaao.txt?token=GHSAT0AAAAAACIJKFVJNVCFEMBTGVLBHOFQZNMPVQQ
 - https://raw.githubusercontent.com/xoo-creative/virtucrime/main/transcripts/daniellekirsty/005BBaFEbms.txt?token=GHSAT0AAAAAACIJKFVI5YCMSCJZUFNZTODSZNMPV5A
