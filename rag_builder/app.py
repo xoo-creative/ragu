@@ -189,9 +189,15 @@ def load_file(state: State):
     a: Assistant = state.assistant
     logging.info(f"Uploaded files looks like {state.uploaded_files}")
 
-    for file in state.uploaded_files:
-        text = read_pdf(file)
+    if type(state.uploaded_files) == list:
+        for file in state.uploaded_files:
+            text = read_pdf(file)
+            state.uploaded_files_text.append(text)
+    elif type(state.uploaded_files) == str:
+        text = read_pdf(state.uploaded_files)
         state.uploaded_files_text.append(text)
+    else:
+        raise RuntimeError("File is not being read, please check the logs.")
 
     state.refresh("uploaded_files_text")
     print(text)
@@ -217,10 +223,21 @@ def select_conv(state: State, var_name: str, value) -> None:
 past_prompts = []
 
 homepage = """
-<|layout|columns= 1 4|
+
+
+<|layout|columns=3 4|
+
 <|part|render=True|class_name=sidebar|
 # **Build Your Own RAGs**{: .color-primary} # {: .logo-text}
+<|layout|columns=1 1|
 
+<|part|render=True|class_name=sidebar|
+<|New Conversation|button|class_name=fullwidth plain|id=reset_app_button|on_action=reset_chat|>
+### Previous activities ### {: .h5 .mt2 .mb-half}
+<|{selected_conv}|tree|lov={past_conversations}|class_name=past_prompts_list|multiple|adapter=tree_adapter|on_change=select_conv|>
+|>
+
+<|part|render=True|class_name=sidebar|
 #### What do you want it to know?
 
 **URLS**
@@ -238,10 +255,12 @@ homepage = """
 <br/>
 ---
 <br/>
-<|New Conversation|button|class_name=fullwidth plain|id=reset_app_button|on_action=reset_chat|>
-### Previous activities ### {: .h5 .mt2 .mb-half}
-<|{selected_conv}|tree|lov={past_conversations}|class_name=past_prompts_list|multiple|adapter=tree_adapter|on_change=select_conv|>
 |>
+
+|>
+
+|>
+
 
 <|part|render=True|class_name=p2 align-item-bottom table|
 <|{conversation}|table|style=style_conv|show_all|width=100%|selected={selected_row}|rebuild|>
@@ -270,8 +289,6 @@ Original code can be found [here](https://github.com/xoo-creative/rag-builder).
 """
 
 root_md = """
-
-<|menu|label=Menu|lov={list_of_pages}|on_action=on_menu|adapter=make_menu_item|>
 
 <|content|>
 
