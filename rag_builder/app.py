@@ -93,12 +93,16 @@ def send_message(state: State) -> None:
         notify(state, "error", "Your query was found to violate OpenAI's content policy. Please try a different query.")
         return 
     
+    conv = state.conversation._dict.copy()
+    conv["Conversation"] += [state.current_user_message]
+    state.current_user_message = ""
+    state.conversation = conv
+    
     notify(state, "info", "Sending message...")
 
     answer = ask_assistant(state)
     conv = state.conversation._dict.copy()
-    conv["Conversation"] += [state.current_user_message, answer]
-    state.current_user_message = ""
+    conv["Conversation"] += [answer]
     state.conversation = conv
     notify(state, "success", "Response received!")
 
