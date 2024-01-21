@@ -228,12 +228,14 @@ def reset_assistant(state: State):
     state.uploaded_files = []
     state.uploaded_files_text = []
     state.rag_ready=False
+    state.conversation = {}
 
     state.refresh("assistant")
     state.refresh("knowledge_urls")
     state.refresh("uploaded_files")
     state.refresh("uploaded_files_text")
     state.refresh("rag_ready")
+    state.refresh("conversation")
 
     notify(state, "success", "Agent now forgotten about the knowledge you uploaded!")
 
@@ -288,7 +290,7 @@ homepage = """
 |>
 
 
-<|part|render={rag_ready}|class_name=p2 align-item-bottom table|
+<|part|render=True|class_name=p2 align-item-bottom table|
 <|{conversation}|table|style=style_conv|show_all|width=100%|selected={selected_row}|rebuild|>
 <|part|class_name=card mt1|render={rag_ready}|
 <|{current_user_message}|input|label=Write your message here...|on_action=send_message|class_name=fullwidth|>
