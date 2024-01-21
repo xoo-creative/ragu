@@ -1,36 +1,22 @@
-# from langchain.vectorstores import Chroma
-# from langchain.chat_models import ChatOllama
 from langchain_openai import ChatOpenAI
-# from langchain.embeddings import FastEmbedEmbeddings
-# from langchain.schema.output_parser import StrOutputParser
-# from langchain.document_loaders import PyPDFLoader
-# from langchain.text_splitter import RecursiveCharacterTextSplitter
-# from langchain.schema.runnable import RunnablePassthrough
-# from langchain.prompts import PromptTemplate
-# from langchain.vectorstores.utils import filter_complex_metadata
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
-from pypdf import PdfReader
-from PyPDF2 import PdfFileReader
 from lxml.html import fromstring
 from bs4 import BeautifulSoup
 
-from rag_builder.commons.utils import clear, load_prompt
+from rag_builder.commons.utils import load_prompt
 
 import requests
 from langchain_core.documents import Document
 from langchain.prompts import ChatPromptTemplate
-from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
+from openai import OpenAI
 
 from dotenv import load_dotenv
 
 import logging
-
-import fitz
 
 load_dotenv()
 
@@ -42,6 +28,7 @@ class Assistant:
         self.llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
         self.memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
         self.initialized = False
+        self.openai_direct_client = OpenAI()
         self.documents_loaded = []
         pass
     
@@ -81,7 +68,7 @@ class Assistant:
         
         url_texts = []
         for url in list_of_urls:
-            url_texts.append(self.read_url(url))
+            url_texts.append(self.read_url(url.strip()))
 
         logging.info("Creating documents from content from urls.")
 
@@ -104,7 +91,7 @@ class Assistant:
 
         tree = fromstring(response.content)
         title = tree.findtext('.//title')
-        self.documents_loaded.append(f"{title} (URL)")
+        self.documents_loaded.append(f"[URL] {title}")
 
         return text
     
@@ -132,6 +119,17 @@ class Assistant:
 
         return prompt
     
+    def is_inappropriate(self, query: str) -> bool:
+        """
+        Returns true if the query is inappropriate
+        """
+        response = self.openai_direct_client.moderations.create(input=query, model="text-moderation-latest")
+
+        output = response.results[0]
+        logging.info(f"Moderation output for query {query}: {output}")
+        return output.flagged
+
+    
     def ask(self, query: str) -> str:
         """
         Asks the assistant a question, returns an answer related to the text.
@@ -139,6 +137,7 @@ class Assistant:
 
         if not self.initialized:
             raise RuntimeError("You have not run 'Assistant.initialize()' yet, so the vector store is empty.")
+
         logging.debug("Begun query")
         result = self.conversation_chain.invoke({"question": query})
         answer = result["answer"]

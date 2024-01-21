@@ -11,7 +11,7 @@ from rag_builder.commons.page import Page
 from rag_builder.commons.utils import get_file_name, read_pdf
 
 # Configure logger
-logging.basicConfig(format="\n%(asctime)s\n%(message)s", level=logging.INFO, force=True)
+logging.basicConfig(format="\n%(asctime)s\n%(message)s", level=logging.DEBUG, force=True)
 
 client = None
 context = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How can I help you today? "
@@ -63,7 +63,7 @@ def request(state: State, prompt: str) -> str:
     return response.choices[0].message.content
 
 
-def update_context(state: State) -> None:
+def ask_assistant(state: State) -> None:
     """
     Update the context with the user's message and the AI's response.
 
@@ -71,6 +71,7 @@ def update_context(state: State) -> None:
         - state: The current state of the app.
     """
     # state.context += f"Human: \n {state.current_user_message}\n\n AI:"
+    
     answer = state.assistant.ask(state.current_user_message)
     print(answer)
     # answer = request(state, state.context).replace("\n", "")
@@ -86,8 +87,15 @@ def send_message(state: State) -> None:
     Args:
         - state: The current state of the app.
     """
+    assistant: Assistant = state.assistant
+
+    if assistant.is_inappropriate(state.current_user_message):
+        notify(state, "error", "Your query was found to violate OpenAI's content policy. Please try a different query.")
+        return 
+    
     notify(state, "info", "Sending message...")
-    answer = update_context(state)
+
+    answer = ask_assistant(state)
     conv = state.conversation._dict.copy()
     conv["Conversation"] += [state.current_user_message, answer]
     state.current_user_message = ""
@@ -175,7 +183,7 @@ def load_knowledge(state: State):
     logging.info(f"Files looks like this: {files}")
 
 
-    urls = [] if urls == "" else urls.split(";")
+    urls = [] if urls == "" else urls.split("\n")
 
     if (len(urls) == 0) and (len(files) == 0):
         notify(state, "error", "You did not input any data! Please either upload files or input links, and try again.",
@@ -188,7 +196,7 @@ def load_knowledge(state: State):
     state.refresh("rag_ready")
 
     state.conversation = {
-        "Conversation": [f"Hi! I am Rug. How can I help you today? I have knowledge of {a.current_knowledge()}"]
+        "Conversation": [f"Hi! I am Rug. How can I help you today? I have knowledge of your uploaded files: {a.current_knowledge()}"]
     }
 
     state.refresh("conversation")
@@ -254,7 +262,7 @@ For example, you can input your **lecture notes**, **wikipedia articles**, **doc
 
 **Links**
 
-<|{knowledge_urls}|input|label=URLs (separated by ';')|multiline|lines_shown=2|class_name=fullwidth|>
+<|{knowledge_urls}|input|label=URLs (one each line)|multiline|lines_shown=2|class_name=fullwidth|>
 
 <br/>
 
@@ -269,7 +277,7 @@ For example, you can input your **lecture notes**, **wikipedia articles**, **doc
 <br/>
 ---
 
-#### Reset the RAG
+#### Reset Rug
 
 <|Reset|button|class_name=plain|id=reset_app_button|on_action=reset_assistant|>
 |>
@@ -334,4 +342,4 @@ if __name__ == "__main__":
 
     assistant = Assistant()
 
-    Gui(pages=pages).run(debug=True, dark_mode=False, use_reloader=True)
+    Gui(pages=pages).run(title="RAG Builder: Customize Your AI", debug=True, dark_mode=False, use_reloader=True)
