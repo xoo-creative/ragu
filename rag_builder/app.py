@@ -265,6 +265,10 @@ homepage = """
 
 #### What do you want it to know?
 
+For example, you can input your **lecture notes**, **wikipedia articles**, **tech documentation** ... and many more!
+
+<br/>
+
 **Links**
 
 <|{knowledge_urls}|input|label=URLs (separated by ';')|multiline|lines_shown=2|class_name=fullwidth|>
@@ -273,7 +277,7 @@ homepage = """
 
 **Files**
 
-<|{uploaded_files}|file_selector|label=Select File|on_action=load_file|extensions=.csv,.pdf|multiple|>
+<|{uploaded_files}|file_selector|label=Select Files|on_action=load_file|extensions=.pdf|multiple|>
 
 <br/>
 <br/>
@@ -281,8 +285,10 @@ homepage = """
 <|Load Knowledge|button|class_name=fullwidth plain|id=reset_app_button|on_action=load_knowledge|>
 <br/>
 ---
-<br/>
-<|Clear Knowledge|button|class_name=fullwidth plain|id=reset_app_button|on_action=reset_assistant|>
+
+#### Reset the RAG
+
+<|Reset|button|class_name=plain|id=reset_app_button|on_action=reset_assistant|>
 |>
 
 
@@ -324,6 +330,11 @@ pages = {
     "home": homepage
 }
 
+# stylekit = {
+#     "color_background_light": "f5efff",
+#     "color_paper_light": "e5d9f2"
+# }
+
 if __name__ == "__main__":
     load_dotenv()
 
@@ -340,4 +351,4 @@ if __name__ == "__main__":
 
     assistant = Assistant()
 
-    Gui(pages=pages).run(debug=True, dark_mode=True, use_reloader=True)
+    Gui(pages=pages).run(debug=True, dark_mode=False, use_reloader=True)

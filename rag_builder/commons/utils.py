@@ -38,5 +38,10 @@ def read_pdf(pdf_path:str):
 
 def get_file_name(filepath: str) -> str:
     filename_ = os.path.basename(filepath)
-    name_of_file, extension = filename_.split(".")[0], filename_.split(".")[2]
+    filename_split = filename_.split(".")
+    if len(filename_split) == 2:
+        ## first time uploading this file
+        name_of_file, extension = filename_.split(".")[0], filename_.split(".")[1]
+    else:
+        name_of_file, extension = filename_.split(".")[0], filename_.split(".")[2]
     return f"{name_of_file}.{extension}"
