@@ -1,6 +1,7 @@
 import pkg_resources
 import fitz
 import logging
+import os
 
 
 def load_text(path: str) -> str:
@@ -34,3 +35,8 @@ def read_pdf(pdf_path:str):
         text += page.get_text().replace("\n", "")
     
     return text
+
+def get_file_name(filepath: str) -> str:
+    filename_ = os.path.basename(filepath)
+    name_of_file, extension = filename_.split(".")[0], filename_.split(".")[2]
+    return f"{name_of_file}.{extension}"
