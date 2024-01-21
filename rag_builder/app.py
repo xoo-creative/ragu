@@ -15,9 +15,7 @@ logging.basicConfig(format="\n%(asctime)s\n%(message)s", level=logging.DEBUG, fo
 
 client = None
 context = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How can I help you today? "
-conversation = {
-    "Conversation": ["Who are you?", "Hi! I am GPT-3. How can I help you today?"]
-}
+conversation = {}
 current_user_message = ""
 past_conversations = []
 selected_conv = None
@@ -36,9 +34,6 @@ def on_init(state: State) -> None:
         - state: The current state of the app.
     """
     state.context = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How can I help you today? "
-    state.conversation = {
-        "Conversation": ["Who are you?", "Hi! I am GPT-3. How can I help you today?"]
-    }
     state.current_user_message = ""
     state.past_conversations = []
     state.selected_conv = None
@@ -114,7 +109,7 @@ def style_conv(state: State, idx: int, row: int) -> str:
     """
     if idx is None:
         return None
-    elif idx % 2 == 0:
+    elif idx % 2 == 1:
         return "user_message"
     else:
         return "gpt_message"
@@ -181,7 +176,22 @@ def load_knowledge(state: State):
 
 
     urls = [] if urls == "" else urls.split(";")
+
+    if (len(urls) == 0) and (len(files) == 0):
+        notify(state, "error", "You did not input any data! Please either upload files or input links, and try again.",
+               duration=5000)
+        return
+
     a.initialize_knowledge(urls = urls, file_contents=files)
+    
+    state.rag_ready = True
+    state.refresh("rag_ready")
+
+    state.conversation = {
+        "Conversation": [f"Hi! I am Rug. How can I help you today? I have knowledge of {a.current_knowledge()}"]
+    }
+
+    state.refresh("conversation")
 
     notify(state, "success", "Agent now knows about the presidential statement!")
 
@@ -193,9 +203,17 @@ def load_file(state: State):
         for file in state.uploaded_files:
             text = read_pdf(file)
             state.uploaded_files_text.append(text)
+
+            filename = os.path.basename(file)
+            state.assistant.add_knowledge_source(filename)
+
     elif type(state.uploaded_files) == str:
         text = read_pdf(state.uploaded_files)
         state.uploaded_files_text.append(text)
+
+        filename = os.path.basename(state.uploaded_files)
+        state.assistant.add_knowledge_source(filename)
+
     else:
         raise RuntimeError("File is not being read, please check the logs.")
 
@@ -209,11 +227,13 @@ def reset_assistant(state: State):
     state.knowledge_urls = ""
     state.uploaded_files = []
     state.uploaded_files_text = []
+    state.rag_ready=False
 
     state.refresh("assistant")
     state.refresh("knowledge_urls")
     state.refresh("uploaded_files")
     state.refresh("uploaded_files_text")
+    state.refresh("rag_ready")
 
     notify(state, "success", "Agent now forgotten about the knowledge you uploaded!")
 
@@ -249,7 +269,9 @@ homepage = """
 
 **Links**
 
-<|{knowledge_urls}|input|label=URLs (separated by ';')|multiline|lines_shown=2|fullwidth|>
+<|{knowledge_urls}|input|label=URLs (separated by ';')|multiline|lines_shown=2|class_name=fullwidth|>
+
+<br/>
 
 **Files**
 
@@ -266,9 +288,9 @@ homepage = """
 |>
 
 
-<|part|render=True|class_name=p2 align-item-bottom table|
+<|part|render={rag_ready}|class_name=p2 align-item-bottom table|
 <|{conversation}|table|style=style_conv|show_all|width=100%|selected={selected_row}|rebuild|>
-<|part|class_name=card mt1|
+<|part|class_name=card mt1|render={rag_ready}|
 <|{current_user_message}|input|label=Write your message here...|on_action=send_message|class_name=fullwidth|>
 |>
 |>
@@ -282,6 +304,7 @@ def on_menu(state, action, info):
     navigate(state, to=page)
 
 list_of_pages = [Page("home", "Home")]
+rag_ready = False
 """
 <br/>
 

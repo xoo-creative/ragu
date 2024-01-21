@@ -13,6 +13,7 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from pypdf import PdfReader
 from PyPDF2 import PdfFileReader
+from lxml.html import fromstring
 
 from rag_builder.commons.utils import clear, load_prompt
 
@@ -40,6 +41,7 @@ class Assistant:
         self.llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
         self.memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
         self.initialized = False
+        self.documents_loaded = []
         pass
     
     def parse_file_contents(self, file_contents: list[str]) -> list[Document]:
@@ -87,12 +89,26 @@ class Assistant:
             chunk_overlap=100,
         )
         return text_splitter.create_documents(url_texts)
-
+    
+    def add_knowledge_source(self, name: str):
+        self.documents_loaded.append(name)
 
     def read_url(self, url) -> str:
 
         res = requests.get(url)
+
+        tree = fromstring(res.content)
+        title = tree.findtext('.//title')
+        self.documents_loaded.append(f"{title} (URL)")
+
         return res.text
+    
+    def current_knowledge(self) -> str:
+        """
+        Renders all current sources of information into a comma separated string.
+        """
+        return ", ".join(self.documents_loaded)
+
 
             
     def _chunk(self):
