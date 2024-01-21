@@ -219,30 +219,30 @@ def select_conv(state: State, var_name: str, value) -> None:
         state.context += state.conversation["Conversation"][i + 1]
     state.selected_row = [len(state.conversation["Conversation"]) + 1]
 
+"""
+<|New Conversation|button|class_name=fullwidth plain|id=reset_app_button|on_action=reset_chat|>
+### Previous activities ### {: .h5 .mt2 .mb-half}
+<|{selected_conv}|tree|lov={past_conversations}|class_name=past_prompts_list|multiple|adapter=tree_adapter|on_change=select_conv|>
+
+
+"""
+
 
 past_prompts = []
 
 homepage = """
 
 
-<|layout|columns=3 4|
+<|layout|columns=2 4|
 
 <|part|render=True|class_name=sidebar|
 # **Build Your Own RAGs**{: .color-primary} # {: .logo-text}
-<|layout|columns=1 1|
 
-<|part|render=True|class_name=sidebar|
-<|New Conversation|button|class_name=fullwidth plain|id=reset_app_button|on_action=reset_chat|>
-### Previous activities ### {: .h5 .mt2 .mb-half}
-<|{selected_conv}|tree|lov={past_conversations}|class_name=past_prompts_list|multiple|adapter=tree_adapter|on_change=select_conv|>
-|>
-
-<|part|render=True|class_name=sidebar|
 #### What do you want it to know?
 
-**URLS**
+**Links**
 
-<|{knowledge_urls}|input|label=URLs (separated by ';')|multiline|lines_shown=2|>
+<|{knowledge_urls}|input|label=URLs (separated by ';')|multiline|lines_shown=2|fullwidth|>
 
 **Files**
 
@@ -255,10 +255,7 @@ homepage = """
 <br/>
 ---
 <br/>
-|>
-
-|>
-
+<|New Conversation|button|class_name=fullwidth plain|id=reset_app_button|on_action=reset_chat|>
 |>
 
 

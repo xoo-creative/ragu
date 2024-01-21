@@ -41,13 +41,6 @@ class Assistant:
         self.memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
         self.initialized = False
         pass
-
-    def read_pdfs(self, files) -> list[Document]:
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500,
-            chunk_overlap=50,
-        )
-        return text_splitter.create_documents([self.read_pdf(files)])
     
     def parse_file_contents(self, file_contents: list[str]) -> list[Document]:
         if len(file_contents) == 0:
@@ -55,8 +48,8 @@ class Assistant:
         
         logging.info("Creating documents from uploaded files. ")
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500,
-            chunk_overlap=50,
+            chunk_size=1000,
+            chunk_overlap=100,
         )
         return text_splitter.create_documents(file_contents)
 
@@ -90,8 +83,8 @@ class Assistant:
         logging.info("Creating documents from content from urls.")
 
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500,
-            chunk_overlap=50,
+            chunk_size=1000,
+            chunk_overlap=100,
         )
         return text_splitter.create_documents(url_texts)
 
@@ -103,7 +96,7 @@ class Assistant:
 
             
     def _chunk(self):
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
         self.chunks = text_splitter.split_documents(self.documents)
         return self.chunks
 
