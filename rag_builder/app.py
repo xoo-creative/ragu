@@ -63,7 +63,7 @@ def request(state: State, prompt: str) -> str:
     return response.choices[0].message.content
 
 
-def ask_assistant(state: State) -> None:
+def ask_assistant(state: State, current_user_message) -> None:
     """
     Update the context with the user's message and the AI's response.
 
@@ -72,7 +72,7 @@ def ask_assistant(state: State) -> None:
     """
     # state.context += f"Human: \n {state.current_user_message}\n\n AI:"
     
-    answer = state.assistant.ask(state.current_user_message)
+    answer = state.assistant.ask(current_user_message)
     print(answer)
     # answer = request(state, state.context).replace("\n", "")
     state.context += answer
@@ -95,12 +95,14 @@ def send_message(state: State) -> None:
     
     conv = state.conversation._dict.copy()
     conv["Conversation"] += [state.current_user_message]
-    state.current_user_message = ""
     state.conversation = conv
+    user_question = state.current_user_message
+    state.current_user_message = ""
+    state.refresh("current_user_message")
     
     notify(state, "info", "Sending message...")
-
-    answer = ask_assistant(state)
+    answer = ask_assistant(state, current_user_message=user_question)
+    state.current_user_message = ""
     conv = state.conversation._dict.copy()
     conv["Conversation"] += [answer]
     state.conversation = conv
