@@ -1,0 +1,1 @@
+web: python rag_builder/app.py -H 0.0.0.0 -P $PORT

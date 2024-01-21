@@ -11,7 +11,7 @@ from rag_builder.commons.page import Page
 from rag_builder.commons.utils import get_file_name, read_pdf
 
 # Configure logger
-logging.basicConfig(format="\n%(asctime)s\n%(message)s", level=logging.DEBUG, force=True)
+logging.basicConfig(format="\n%(asctime)s\n%(message)s", level=logging.INFO, force=True)
 
 client = None
 context = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How can I help you today? "
