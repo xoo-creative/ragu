@@ -23,3 +23,6 @@ def load_prompt(prompt_file_name: str) -> str:
                                                   resource_name=f"prompts/{prompt_file_name}.txt")
 
     return load_text(prompt_path)
+
+def clear(filepath: str) -> None:
+    open(filepath, 'w').close()

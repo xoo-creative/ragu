@@ -8,14 +8,16 @@ from langchain_openai import ChatOpenAI
 # from langchain.schema.runnable import RunnablePassthrough
 # from langchain.prompts import PromptTemplate
 # from langchain.vectorstores.utils import filter_complex_metadata
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from pypdf import PdfReader
 from PyPDF2 import PdfFileReader
 
-from rag_builder.commons.utils import load_prompt
+from rag_builder.commons.utils import clear, load_prompt
 
 import requests
+from langchain_core.documents import Document
 from langchain.prompts import ChatPromptTemplate
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
@@ -40,9 +42,9 @@ class Assistant:
         self.initialized = False
         pass
 
-    def initialize_knowledge(self):
+    def initialize_knowledge(self, urls = list[str]):
 
-        self._load_url()
+        self.documents = self.read_urls(urls)
         self._chunk()
         self.embed_and_store()
 
@@ -71,20 +73,26 @@ class Assistant:
             # print(txt)
             # return txt
         
+    def read_urls(self, list_of_urls = list[str]) -> list[Document]:
+        url_texts = []
+        for url in list_of_urls:
+            url_texts.append(self.read_url(url))
 
-    def _load_url(self) -> None:
-        url = "https://raw.githubusercontent.com/langchain-ai/langchain/master/docs/docs/modules/state_of_the_union.txt"
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=500,
+            chunk_overlap=50,
+        )
+        return text_splitter.create_documents(url_texts)
+
+
+    def read_url(self, url) -> str:
+
         res = requests.get(url)
-        with open("state_of_the_union.txt", "w") as f:
-            f.write(res.text)
+        return res.text
 
-        loader = TextLoader('./state_of_the_union.txt')
-        self.documents = loader.load()
-
-        return self.documents
-    
+            
     def _chunk(self):
-        text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
         self.chunks = text_splitter.split_documents(self.documents)
         return self.chunks
 

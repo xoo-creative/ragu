@@ -21,6 +21,8 @@ past_conversations = []
 selected_conv = None
 selected_row = [1]
 
+knowledge_urls = ""
+
 
 def on_init(state: State) -> None:
     """
@@ -157,9 +159,11 @@ def tree_adapter(item: list) -> [str, str]:
     return (item[0], "Empty conversation")
 
 def load_knowledge(state: State):
-    a: Assistant = state.assistant
 
-    a.initialize_knowledge()
+    a: Assistant = state.assistant
+    urls: str = state.knowledge_urls
+
+    a.initialize_knowledge(urls = urls.split(";"))
 
     notify(state, "success", "Agent now knows about the presidential statement!")
     
@@ -187,8 +191,18 @@ past_prompts = []
 page = """
 <|layout|columns=300px 1|
 <|part|render=True|class_name=sidebar|
-# Taipy **Chat**{: .color-primary} # {: .logo-text}
+# **Build Your Own RAGs**{: .color-primary} # {: .logo-text}
+
+#### What do you want it to know?
+
+<|{knowledge_urls}|input|label=URLs (separated by ';')|multiline|lines_shown=2|>
+
+<br/>
+
 <|Load Knowledge|button|class_name=fullwidth plain|id=reset_app_button|on_action=load_knowledge|>
+<br/>
+---
+<br/>
 <|New Conversation|button|class_name=fullwidth plain|id=reset_app_button|on_action=reset_chat|>
 ### Previous activities ### {: .h5 .mt2 .mb-half}
 <|{selected_conv}|tree|lov={past_conversations}|class_name=past_prompts_list|multiple|adapter=tree_adapter|on_change=select_conv|>
