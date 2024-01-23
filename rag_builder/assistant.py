@@ -126,7 +126,7 @@ class Assistant:
         response = self.openai_direct_client.moderations.create(input=query, model="text-moderation-latest")
 
         output = response.results[0]
-        logging.info(f"Moderation output for query {query}: {output}")
+        logging.debug(f"Moderation output for query {query}: {output}")
         return output.flagged
 
     
@@ -138,11 +138,8 @@ class Assistant:
         if not self.initialized:
             raise RuntimeError("You have not run 'Assistant.initialize()' yet, so the vector store is empty.")
 
-        logging.debug("Begun query")
         result = self.conversation_chain.invoke({"question": query})
         answer = result["answer"]
-        print(answer)
-        logging.debug("Ended query")
 
         return answer
 

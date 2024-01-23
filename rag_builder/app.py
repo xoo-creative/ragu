@@ -11,7 +11,7 @@ from rag_builder.commons.page import Page
 from rag_builder.commons.utils import get_file_name, read_pdf
 
 # Configure logger
-logging.basicConfig(format="\n%(asctime)s\n%(message)s", level=logging.DEBUG, force=True)
+logging.basicConfig(format="\n%(asctime)s\n%(message)s", level=logging.INFO, force=True)
 
 client = None
 context = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How can I help you today? "
@@ -38,29 +38,6 @@ def on_init(state: State) -> None:
     state.past_conversations = []
     state.selected_conv = None
     state.selected_row = [1]
-
-
-def request(state: State, prompt: str) -> str:
-    """
-    Send a prompt to the GPT-3 API and return the response.
-
-    Args:
-        - state: The current state of the app.
-        - prompt: The prompt to send to the API.
-
-    Returns:
-        The response from the API.
-    """
-    response = state.client.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": f"{prompt}",
-            }
-        ],
-        model="gpt-3.5-turbo",
-    )
-    return response.choices[0].message.content
 
 
 def ask_assistant(state: State, current_user_message) -> None:
@@ -140,53 +117,13 @@ def on_exception(state, function_name: str, ex: Exception) -> None:
     """
     notify(state, "error", f"An error occured in {function_name}: {ex}")
 
-
-def reset_chat(state: State) -> None:
-    """
-    Reset the chat by clearing the conversation.
-
-    Args:
-        - state: The current state of the app.
-    """
-    state.past_conversations = state.past_conversations + [
-        [len(state.past_conversations), state.conversation]
-    ]
-    state.conversation = {
-        "Conversation": ["Who are you?", "Hi! I am GPT-3. How can I help you today?"]
-    }
-    gui: Gui = state.get_gui()
-    page_index = len(state.list_of_pages)
-    page_name = f"New_Conversation_{page_index}"
-    page_path = f"conversation_{page_index}"
-    gui.add_page(page_path, homepage)
-    state.list_of_pages.append(Page(page_path, page_name))
-
-    state.refresh("list_of_pages")
-
-
-
-def tree_adapter(item: list) -> [str, str]:
-    """
-    Converts element of past_conversations to id and displayed string
-
-    Args:
-        item: element of past_conversations
-
-    Returns:
-        id and displayed string
-    """
-    identifier = item[0]
-    if len(item[1]["Conversation"]) > 3:
-        return (identifier, item[1]["Conversation"][2][:50] + "...")
-    return (item[0], "Empty conversation")
-
 def load_knowledge(state: State):
 
     a: Assistant = state.assistant
     urls: str = state.knowledge_urls
     files = state.uploaded_files_text
 
-    logging.info(f"Files looks like this: {files}")
+    # logging.info(f"Files looks like this: {files}")
 
 
     urls = [] if urls == "" else urls.split("\n")
@@ -211,7 +148,7 @@ def load_knowledge(state: State):
 
 def load_file(state: State):
     a: Assistant = state.assistant
-    logging.info(f"Uploaded files looks like {state.uploaded_files}")
+    logging.debug(f"Uploaded files looks like {state.uploaded_files}")
 
     if type(state.uploaded_files) == list:
         for file in state.uploaded_files:
