@@ -6,9 +6,9 @@ import openai
 from dotenv import load_dotenv
 import logging
 
-from rag_builder.assistant import Assistant
-from rag_builder.commons.page import Page
-from rag_builder.commons.utils import get_file_name, read_pdf
+from ragu.assistant import Assistant
+from ragu.commons.page import Page
+from ragu.commons.utils import get_file_name, read_pdf
 
 # Configure logger
 logging.basicConfig(format="\n%(asctime)s\n%(message)s", level=logging.INFO, force=True)

@@ -5,7 +5,7 @@ from langchain.memory import ConversationBufferMemory
 from lxml.html import fromstring
 from bs4 import BeautifulSoup
 
-from rag_builder.commons.utils import load_prompt
+from ragu.commons.utils import load_prompt
 
 import requests
 from langchain_core.documents import Document

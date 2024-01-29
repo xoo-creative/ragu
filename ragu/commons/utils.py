@@ -20,7 +20,7 @@ def load_text(path: str) -> str:
     
 def load_prompt(prompt_file_name: str) -> str:
 
-    prompt_path = pkg_resources.resource_filename(package_or_requirement="rag_builder", 
+    prompt_path = pkg_resources.resource_filename(package_or_requirement="ragu", 
                                                   resource_name=f"prompts/{prompt_file_name}.txt")
 
     return load_text(prompt_path)
