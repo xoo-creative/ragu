@@ -28,6 +28,7 @@ RAG-U provides a simple, no-code interface for you to build your own RAG-powered
 This project was completed and presented at nwHacks 2024, and you can see my accompanying slideshow [here](https://docs.google.com/presentation/d/1KFv356uHVDhtv_b83GKmrXqJ59rG9K0AXE_-LtvA3UQ/edit?usp=sharing). It was a top performer in the "Best Use of Taipy" category.
 
 ## Architecture
+
 `RAGU` was built with Python, using [LangChain](https://python.langchain.com/docs/get_started/introduction) as the orchestration service, and [taipy](https://github.com/Avaiga/taipy) as the front-end. RAGU is powered by OpenAI's GPT-3.5 model, and uses [Facebook AI Similarity Search (FAISS)](https://python.langchain.com/docs/integrations/vectorstores/faiss) for the vector database for text. [`PyMuPDF`](https://github.com/pymupdf/PyMuPDF) performs PDF parsing, and [`BeautifulSoup4`](https://pypi.org/project/beautifulsoup4/) and [`lxml`](https://pypi.org/project/lxml/) handle URL parsing.
 
 ## Next up
