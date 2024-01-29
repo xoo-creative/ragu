@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "rag-builder"
+name = "ragu"
 version = "0.1.0"
 description = ""
 authors = ["Tommy Xu <tommysteryy@gmail.com>"]
