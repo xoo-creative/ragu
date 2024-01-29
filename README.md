@@ -21,9 +21,7 @@ RAG-U provides a simple, no-code interface for you to build your own RAG-powered
 
 ## Demo
 
-<video controls>
-<source src="./static/ragu-demo.mov" type="video/mp4">
-</video>
+![RAGU Demo](./static/ragu_demo.gif "RAGU Demo")
 
 ## Slides
 
